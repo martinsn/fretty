@@ -31,7 +31,7 @@ rsync -az --delete \
 echo "==> Fixing ownership, installing deps & restarting..."
 ssh "$SERVER" bash -s << 'REMOTE'
 set -euo pipefail
-chown -R fretty:fretty /opt/fretty/backend /opt/fretty/frontend
+chown -R fretty:fretty /opt/fretty
 
 # Create venv if not exists
 if [ ! -d /opt/fretty/backend/venv ]; then

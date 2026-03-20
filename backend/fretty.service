@@ -8,7 +8,7 @@ Group=fretty
 WorkingDirectory=/opt/fretty/backend
 Environment="PATH=/opt/fretty/backend/venv/bin:/usr/local/bin:/usr/bin:/bin"
 Environment="DATABASE_URL=sqlite+aiosqlite:///./fretty.db"
-Environment="SECRET_KEY=change-this-secret-key"
+Environment="SECRET_KEY=fretty-change-this-secret-key-in-production"
 Environment="CORS_ORIGINS=*"
 Command=/opt/fretty/backend/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8001
 Restart=always
