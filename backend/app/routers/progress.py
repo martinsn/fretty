@@ -3,7 +3,7 @@ import aiosqlite
 import json
 from datetime import datetime
 
-from app.config import DATABASE_URL
+from app.config import DATABASE_PATH
 from app.schemas import SettingsUpdate, SettingsOut, UserStats
 from app.routers.auth import get_current_user
 
@@ -13,7 +13,7 @@ router = APIRouter(prefix="/progress", tags=["progress"])
 @router.get("/stats", response_model=UserStats)
 async def get_stats(user=Depends(get_current_user)):
     """Get user statistics."""
-    async with aiosqlite.connect(DATABASE_URL) as db:
+    async with aiosqlite.connect(str(DATABASE_PATH)) as db:
         db.row_factory = aiosqlite.Row
         
         # Get stats
@@ -50,15 +50,15 @@ async def get_stats(user=Depends(get_current_user)):
             correct_today=stats["correct_today"],
             streak=stats["streak"],
             last_practice_date=stats["last_practice_date"],
-            cards_learned=cards["learned"],
-            cards_due=due
+            cards_learned=cards["learned"] or 0,
+            cards_due=due or 0
         )
 
 
 @router.get("/settings", response_model=SettingsOut)
 async def get_settings(user=Depends(get_current_user)):
     """Get user settings."""
-    async with aiosqlite.connect(DATABASE_URL) as db:
+    async with aiosqlite.connect(str(DATABASE_PATH)) as db:
         db.row_factory = aiosqlite.Row
         cursor = await db.execute(
             "SELECT whole_notes_only, strings, max_fret, practice_mode FROM user_settings WHERE user_id = ?",
@@ -87,7 +87,7 @@ async def get_settings(user=Depends(get_current_user)):
 @router.put("/settings", response_model=SettingsOut)
 async def update_settings(settings: SettingsUpdate, user=Depends(get_current_user)):
     """Update user settings."""
-    async with aiosqlite.connect(DATABASE_URL) as db:
+    async with aiosqlite.connect(str(DATABASE_PATH)) as db:
         await db.execute(
             """INSERT INTO user_settings (user_id, whole_notes_only, strings, max_fret, practice_mode)
                VALUES (?, ?, ?, ?, ?)

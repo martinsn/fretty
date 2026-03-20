@@ -3,7 +3,7 @@ import aiosqlite
 import json
 from datetime import datetime
 
-from app.config import DATABASE_URL
+from app.config import DATABASE_PATH
 from app.schemas import CardProgress, CardUpdate, PracticeResult
 from app.routers.auth import get_current_user
 
@@ -46,7 +46,7 @@ def sm2(card: dict, quality: int) -> dict:
 @router.get("/all", response_model=list[CardProgress])
 async def get_all_cards(user=Depends(get_current_user)):
     """Get all card progress for the user."""
-    async with aiosqlite.connect(DATABASE_URL) as db:
+    async with aiosqlite.connect(str(DATABASE_PATH)) as db:
         db.row_factory = aiosqlite.Row
         cursor = await db.execute(
             "SELECT position_key, easiness, interval, repetitions, next_review FROM card_progress WHERE user_id = ?",
@@ -60,7 +60,7 @@ async def get_all_cards(user=Depends(get_current_user)):
 async def get_due_cards(user=Depends(get_current_user)):
     """Get cards that are due for review."""
     now = int(datetime.utcnow().timestamp() * 1000)
-    async with aiosqlite.connect(DATABASE_URL) as db:
+    async with aiosqlite.connect(str(DATABASE_PATH)) as db:
         db.row_factory = aiosqlite.Row
         cursor = await db.execute(
             """SELECT position_key, easiness, interval, repetitions, next_review 
@@ -77,7 +77,7 @@ async def get_random_card(user=Depends(get_current_user)):
     """Get a random card to practice."""
     now = int(datetime.utcnow().timestamp() * 1000)
     
-    async with aiosqlite.connect(DATABASE_URL) as db:
+    async with aiosqlite.connect(str(DATABASE_PATH)) as db:
         db.row_factory = aiosqlite.Row
         
         # First try to get a due card
@@ -112,7 +112,7 @@ async def get_random_card(user=Depends(get_current_user)):
 @router.post("/answer", response_model=PracticeResult)
 async def answer_card(update: CardUpdate, user=Depends(get_current_user)):
     """Submit an answer for a card and get updated progress."""
-    async with aiosqlite.connect(DATABASE_URL) as db:
+    async with aiosqlite.connect(str(DATABASE_PATH)) as db:
         db.row_factory = aiosqlite.Row
         
         # Get current card
@@ -197,7 +197,7 @@ async def answer_card(update: CardUpdate, user=Depends(get_current_user)):
 @router.post("/init")
 async def initialize_cards(user=Depends(get_current_user)):
     """Initialize all cards for a new user based on settings."""
-    async with aiosqlite.connect(DATABASE_URL) as db:
+    async with aiosqlite.connect(str(DATABASE_PATH)) as db:
         db.row_factory = aiosqlite.Row
         
         # Get user settings

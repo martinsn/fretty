@@ -1,9 +1,10 @@
 import os
 from pathlib import Path
 
-# Database
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./fretty.db")
-DATABASE_PATH = Path(__file__).parent.parent / "fretty.db"
+# Database - absolute path
+BASE_DIR = Path(__file__).parent.parent.resolve()
+DATABASE_PATH = BASE_DIR / "fretty.db"
+DATABASE_URL = f"sqlite+aiosqlite:///{DATABASE_PATH}"
 
 # JWT
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
