@@ -39,7 +39,7 @@ async def health():
 
 # Serve static frontend in production
 _static_dir = config.STATIC_DIR or os.path.join(
-    os.path.dirname(__file__), "..", "..", "dist"
+    os.path.dirname(__file__), "..", "..", "frontend", "dist"
 )
 _static_path = Path(_static_dir).resolve()
 

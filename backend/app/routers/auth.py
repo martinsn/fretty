@@ -5,7 +5,8 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 import aiosqlite
 
-from app.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, DATABASE_PATH
+from app import config
+from app.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 from app.schemas import UserRegister, UserLogin, Token, UserOut
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -38,7 +39,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     except JWTError:
         raise credentials_exception
 
-    async with aiosqlite.connect(str(DATABASE_PATH)) as db:
+    async with aiosqlite.connect(config.DB_PATH) as db:
         db.row_factory = aiosqlite.Row
         cursor = await db.execute("SELECT id, username FROM users WHERE id = ?", (user_id,))
         user = await cursor.fetchone()
@@ -49,7 +50,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
 @router.post("/register", response_model=Token)
 async def register(data: UserRegister):
-    async with aiosqlite.connect(str(DATABASE_PATH)) as db:
+    async with aiosqlite.connect(config.DB_PATH) as db:
         # Check if user exists
         cursor = await db.execute("SELECT id FROM users WHERE username = ?", (data.username,))
         if await cursor.fetchone():
@@ -84,7 +85,7 @@ async def register(data: UserRegister):
 
 @router.post("/login", response_model=Token)
 async def login(data: UserLogin):
-    async with aiosqlite.connect(str(DATABASE_PATH)) as db:
+    async with aiosqlite.connect(config.DB_PATH) as db:
         db.row_factory = aiosqlite.Row
         cursor = await db.execute(
             "SELECT id, username, password_hash FROM users WHERE username = ?",

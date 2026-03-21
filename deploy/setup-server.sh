@@ -43,7 +43,8 @@ chown -R fretty:fretty /opt/fretty/backend/venv
 echo "==> Writing production .env..."
 cat > /opt/fretty/.env << EOF
 SECRET_KEY=$SECRET_KEY
-DATABASE_URL=sqlite+aiosqlite:///./fretty.db
+DB_PATH=/opt/fretty/data/fretty.db
+STATIC_DIR=/opt/fretty/frontend/dist
 CORS_ORIGINS=https://$DOMAIN
 EOF
 chown fretty:fretty /opt/fretty/.env
@@ -54,7 +55,7 @@ cp /tmp/fretty.service /etc/systemd/system/fretty.service
 systemctl daemon-reload
 systemctl enable fretty
 
-echo "==> Configuring nginx..."
+echo "==> Configuring nginx (adding fretty site — existing sites untouched)..."
 sed "s/DOMAIN_PLACEHOLDER/$DOMAIN/g" /tmp/fretty-nginx.conf > /etc/nginx/sites-available/fretty
 ln -sf /etc/nginx/sites-available/fretty /etc/nginx/sites-enabled/fretty
 nginx -t

@@ -1,10 +1,10 @@
 import aiosqlite
-from pathlib import Path
-from app.config import DATABASE_PATH
+from app import config
+
 
 async def init_db():
     """Initialize the database with required tables."""
-    async with aiosqlite.connect(str(DATABASE_PATH)) as db:
+    async with aiosqlite.connect(config.DB_PATH) as db:
         # Users table
         await db.execute("""
             CREATE TABLE IF NOT EXISTS users (
@@ -59,7 +59,7 @@ async def init_db():
 
 async def get_db():
     """Get database connection."""
-    db = await aiosqlite.connect(str(DATABASE_PATH))
+    db = await aiosqlite.connect(config.DB_PATH)
     db.row_factory = aiosqlite.Row
     try:
         yield db
