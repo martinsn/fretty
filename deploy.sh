@@ -10,7 +10,7 @@ fi
 source "$SCRIPT_DIR/deploy/.env"
 
 echo "==> Building frontend..."
-cd "$SCRIPT_DIR/frontend"
+cd "$SCRIPT_DIR"
 npm install --silent
 npm run build
 
@@ -25,7 +25,7 @@ rsync -az --delete \
 
 echo "==> Syncing frontend dist to server..."
 rsync -az --delete \
-    "$SCRIPT_DIR/frontend/dist/" \
+    "$SCRIPT_DIR/dist/" \
     "$SERVER:/opt/fretty/frontend/dist/"
 
 echo "==> Fixing ownership, installing deps & restarting..."
